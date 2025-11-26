@@ -1,14 +1,19 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { ReportResult } from "../types";
 
-const apiKey = process.env.API_KEY;
+// Deklarasi agar TypeScript tidak error saat mengakses process
+declare const process: any;
 
-// Initialize Gemini client only if API key is present (handled safely in the call)
+// Mengambil API Key dengan aman (fallback ke undefined jika process tidak ada)
+// Ini mencegah "White Screen of Death" jika env variables belum terload sempurna
+const apiKey = typeof process !== 'undefined' && process.env ? process.env.API_KEY : undefined;
+
+// Initialize Gemini client only if API key is present
 const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
 export const generateInternReport = async (keywords: string): Promise<ReportResult> => {
   if (!ai) {
-    throw new Error("API Key tidak ditemukan. Pastikan environment variable API_KEY sudah diset.");
+    throw new Error("API Key tidak ditemukan. Pastikan Environment Variable 'API_KEY' sudah diset di Vercel.");
   }
 
   const modelId = "gemini-2.5-flash"; // Optimized for speed and text generation
